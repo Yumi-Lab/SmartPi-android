@@ -23,5 +23,12 @@ if [ "$TARGET" = "android" ]; then
   cd "$SRC/android"
   ./build.sh -b "$BOARD"
   echo "=== pack output ==="
-  ls -la "$SRC"/lichee/tools/pack/*.img 2>/dev/null || echo "WARNING: no .img produced in lichee/tools/pack/"
+  # the Allwinner pack tools always exit 0, even when the image build fails
+  # (e.g. "Dragon execute image.cfg Failed"), so check for the artifact itself
+  if ! ls "$SRC"/lichee/tools/pack/*.img >/dev/null 2>&1; then
+    echo "ERROR: pack produced no .img - check the pack log above for" >&2
+    echo "       'Dragon execute image.cfg Failed' or an empty sunxi_mbr.fex" >&2
+    exit 1
+  fi
+  ls -la "$SRC"/lichee/tools/pack/*.img
 fi

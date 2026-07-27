@@ -22,6 +22,7 @@ RUN echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive \
       git ca-certificates curl wget file \
       python python-dev \
       bison flex gperf bc cpio rsync fakeroot gawk \
+      busybox dos2unix \
       zip unzip xz-utils lzop \
       libxml2-utils xsltproc \
       libncurses5-dev libreadline6-dev libssl-dev \
@@ -29,6 +30,19 @@ RUN echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive \
       u-boot-tools dosfstools mtools \
       ccache \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# tools/pack/pack calls "busybox unix2dos" on the FEX files, but Debian strips
+# those applets from its busybox. Without the CRLF conversion the Allwinner
+# "script" FEX compiler segfaults on sys_partition.fex and the image never
+# gets an MBR. Forward the two applets to the dos2unix package.
+RUN printf '%s\n' \
+      '#!/bin/sh' \
+      'case "$1" in' \
+      '  unix2dos|dos2unix) applet="$1"; shift; exec "$applet" "$@" ;;' \
+      '  *) exec /bin/busybox "$@" ;;' \
+      'esac' \
+      > /usr/local/bin/busybox \
+ && chmod +x /usr/local/bin/busybox
 
 # Oracle JDK 1.6.0_45, required by the Android 4.4 build system.
 # trusty's CA store cannot validate the mirror's modern certificate chain,

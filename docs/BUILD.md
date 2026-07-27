@@ -41,6 +41,11 @@ If the free runner proves too small, move to a real x86 server (Hetzner class). 
 
 ## Known traps
 
-- Sources must be fetched on the host (modern git, python3 for gdown), never inside the trusty container (git 1.9, dead CA store).
+- Sources must be fetched on the host (modern git, python3 for gdown), never inside the container (ancient git and CA store).
 - Google Drive quota errors are frequent; prefer the `sources-archive` release of this repo once populated (see [SOURCES.md](SOURCES.md)).
 - The `android/` directory must sit next to `lichee/`; the fa_tools scripts use relative paths.
+- The lichee tree ships no cross toolchain. `brandy/build.sh -t` expects `brandy/toolchain/gcc-linaro-arm.tar.xz` and the kernel needs the soft-float `arm-linux-gnueabi-` prefix; `fetch-sources.sh` installs it.
+- Host tools the BSP assumes without declaring: `fakeroot` (rootfs cpio), `gawk` (kernel scripts use `strtonum`, absent from mawk), `file` (AOSP `gcc-sdk` wrappers detect the host arch with it), `busybox unix2dos` (see below).
+- `tools/pack/pack` runs `busybox unix2dos` on the FEX files, but Debian's busybox lacks that applet. Without the CRLF conversion the Allwinner `script` compiler segfaults on `sys_partition.fex`, `sunxi_mbr.fex` ends up empty and the image build dies with `Dragon execute image.cfg Failed`. The container installs `dos2unix` and shims `busybox` to forward those two applets.
+- The Allwinner pack tools exit 0 even when they fail, so `scripts/build.sh` verifies that an `.img` actually exists.
+- Do not trust a local container build on an Apple Silicon Mac: qemu emulation of the wheezy i386/amd64 binaries segfaults at random points (apt methods, dpkg maintainer scripts). Only the x86_64 CI result is meaningful.
