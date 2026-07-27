@@ -57,8 +57,8 @@ Resource needs for a full Android build: about 8 GB RAM, 40 GB disk, 2-4 h on 4 
 - [x] Reproducible Docker build, green CI build of lichee (u-boot + kernel, 12 min)
 - [x] Full Android build in CI, producing a flashable image: [v0.1.0-untested](https://github.com/Yumi-Lab/SmartPi-android/releases/tag/v0.1.0-untested) (1 h 23 on a free runner)
 - [ ] **Boot test on SmartPi One hardware** - nothing below can be trusted until this passes
+- [x] dd-able SD image, so the card can be written from macOS or Linux without PhoenixCard (see [docs/FLASHING.md](docs/FLASHING.md)) - structurally verified, not yet booted
 - [ ] SmartPi One customization: FEX, Yumi branding (bootlogo, bootanimation), SmartPad rotation
-- [ ] dd-able image instead of PhoenixCard (see [docs/FLASHING.md](docs/FLASHING.md))
 
 Open questions are tracked in [docs/FLASHING.md](docs/FLASHING.md) (dd-able image production) and [docs/HARDWARE.md](docs/HARDWARE.md) (rotation).
 
