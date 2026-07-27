@@ -19,7 +19,7 @@ RUN echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive \
       build-essential gcc-multilib g++-multilib libc6-dev-i386 \
       libc6:i386 libstdc++6:i386 zlib1g:i386 libncurses5:i386 \
       lib32z1-dev lib32ncurses5-dev \
-      git ca-certificates curl wget \
+      git ca-certificates curl wget file \
       python python-dev \
       bison flex gperf bc cpio rsync fakeroot gawk \
       zip unzip xz-utils lzop \
