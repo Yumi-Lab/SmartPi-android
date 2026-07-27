@@ -40,9 +40,18 @@ jobs:
             -v "$GITHUB_WORKSPACE:/work" \
             smartpi-android-build /work/scripts/build.sh "${{ inputs.target }}"
 
+      - name: Build dd-able SD image
+        if: ${{ inputs.target == 'android' }}
+        run: |
+          python3 scripts/make-sdimage.py sources/lichee/tools/pack/out \
+            -o smartpi-one-android-4.4-sd.img
+          gzip -6 smartpi-one-android-4.4-sd.img
+          ls -lh smartpi-one-android-4.4-sd.img.gz
+
       - name: Collect artifacts
         run: |
           mkdir -p out
+          cp -v smartpi-one-android-4.4-sd.img.gz out/ 2>/dev/null || true
           # full android runs produce the flashable image here
           cp -v sources/lichee/tools/pack/*.img out/ 2>/dev/null || true
           # boot chain binaries staged by the lichee build (boot0, u-boot, sboot)
