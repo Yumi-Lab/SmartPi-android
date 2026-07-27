@@ -21,7 +21,7 @@ File ids (fetch with `gdown <id>`):
 |------|----------|---------|
 | `sun8iw7p1_android_h3_uart0.img.zip` | `18_7bcI5-IhfDa1M1iVT3-KPa7w7X5Nug` | Official Android 4.4.2 SD image. Step one of the project: flash and boot-test on SmartPi One. In `01_Official images/01_SD card images`. |
 | `sha256sum.txt` | `1eGKfQKYhI4fZaTdqShj4Ev9kCpvYrdqZ` | Checksums for the SD card images folder |
-| `gcc-linaro-arm.tar.xz` | `1QdloBW9YaTyqRVAjbpoGCadAhDL_koVH` | Cross toolchain from `04_SDK and toolchain`. The lichee tree does NOT bundle a toolchain: `brandy/build.sh -t` expects this tarball at `lichee/brandy/toolchain/gcc-linaro-arm.tar.xz` and the kernel needs `arm-linux-gnueabi-gcc` on PATH from it. We use the equivalent from `YuzukiHD/sunxi-bsp-toolchains` instead (see below). |
+| `gcc-linaro-arm.tar.xz` | `1QdloBW9YaTyqRVAjbpoGCadAhDL_koVH` | Cross toolchain from `04_SDK and toolchain`. The lichee tree does NOT bundle a toolchain: `brandy/build.sh -t` expects this tarball at `lichee/brandy/toolchain/gcc-linaro-arm.tar.xz` and the kernel needs `arm-linux-gnueabi-gcc` on PATH from it. We use the equivalent from `YuzukiHD/sunxi-bsp-toolchains` instead (see below); the FriendlyELEC original is archived as `gcc-linaro-arm-friendlyelec.tar.xz` once the Drive quota lets it through. |
 | `fa-toolchain.tgz` | `1Nzug_j2J1xT7O6Gt3ujSWzhJdGy0_ZVF` | From `04_SDK and toolchain/build-env-on-ubuntu` (with `install.sh` id `1MLuXFSKvm-ottnj3XhZ0BKfuqW2M5MPp`) |
 | `PhoenixCard_V310.rar` | `18_LzRJoRRINBFTCYs48aBqbTqAIgXVog` | Windows SD flashing tool for Allwinner images |
 | `LiveSuitV306_For_Linux64.zip` | `1wt88Qcp_Pv0JswFfQp8YP0TcPxJcgh8C` | Linux USB (FEL) flashing tool |

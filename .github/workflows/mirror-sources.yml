@@ -10,6 +10,10 @@ on:
         description: Also snapshot the GitLab h3_android-4.4 tree (large)
         type: boolean
         default: true
+  schedule:
+    # daily retry until the Drive quota lets the remaining files through;
+    # already-mirrored assets are skipped, so this is a no-op once complete
+    - cron: '17 5 * * *'
 
 permissions:
   contents: write
@@ -32,9 +36,15 @@ jobs:
         run: pip install gdown
 
       - name: Download Drive files
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p mirror && cd mirror
+          existing=$(gh release view sources-archive --json assets --jq '.assets[].name' 2>/dev/null || true)
           dl() {
+            if echo "$existing" | grep -qx "$2"; then
+              echo "already mirrored, skipping: $2"; return 0
+            fi
             for i in 1 2 3; do
               gdown "$1" -O "$2" && return 0
               echo "retry $i for $2 (Drive quota?)"; sleep 90
@@ -45,11 +55,14 @@ jobs:
           }
           dl 18_7bcI5-IhfDa1M1iVT3-KPa7w7X5Nug sun8iw7p1_android_h3_uart0.img.zip
           dl 1eGKfQKYhI4fZaTdqShj4Ev9kCpvYrdqZ sha256sum.txt
-          dl 1QdloBW9YaTyqRVAjbpoGCadAhDL_koVH gcc-linaro-arm.tar.xz
+          dl 1QdloBW9YaTyqRVAjbpoGCadAhDL_koVH gcc-linaro-arm-friendlyelec.tar.xz
           dl 1Nzug_j2J1xT7O6Gt3ujSWzhJdGy0_ZVF fa-toolchain.tgz
           dl 18_LzRJoRRINBFTCYs48aBqbTqAIgXVog PhoenixCard_V310.rar
           dl 1wt88Qcp_Pv0JswFfQp8YP0TcPxJcgh8C LiveSuitV306_For_Linux64.zip
-          sha256sum * > SHA256SUMS.mirror.txt || true
+          # append new checksums to the running list on the release
+          gh release download sources-archive -p SHA256SUMS.mirror.txt -O ../old-sums.txt 2>/dev/null || touch ../old-sums.txt
+          sha256sum * >> ../old-sums.txt 2>/dev/null || true
+          sort -u -k2 ../old-sums.txt > SHA256SUMS.mirror.txt
           ls -la
 
       - name: Upload Drive files to release
