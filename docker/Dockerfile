@@ -21,7 +21,7 @@ RUN echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive \
       lib32z1-dev lib32ncurses5-dev \
       git ca-certificates curl wget \
       python python-dev \
-      bison flex gperf bc cpio rsync fakeroot \
+      bison flex gperf bc cpio rsync fakeroot gawk \
       zip unzip xz-utils lzop \
       libxml2-utils xsltproc \
       libncurses5-dev libreadline6-dev libssl-dev \
