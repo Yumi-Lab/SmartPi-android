@@ -5,10 +5,13 @@ FROM --platform=linux/amd64 ubuntu:14.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# trusty only survives on old-releases.ubuntu.com
-RUN sed -i -e 's|archive.ubuntu.com|old-releases.ubuntu.com|g' \
-           -e 's|security.ubuntu.com|old-releases.ubuntu.com|g' \
-           /etc/apt/sources.list \
+# trusty only survives on old-releases.ubuntu.com, which carries no i386
+# indexes for trusty-security (404) - hence the per-pocket arch lists
+RUN { \
+      echo 'deb [arch=amd64,i386] http://old-releases.ubuntu.com/ubuntu/ trusty main restricted universe multiverse'; \
+      echo 'deb [arch=amd64,i386] http://old-releases.ubuntu.com/ubuntu/ trusty-updates main restricted universe multiverse'; \
+      echo 'deb [arch=amd64] http://old-releases.ubuntu.com/ubuntu/ trusty-security main restricted universe multiverse'; \
+    } > /etc/apt/sources.list \
  && dpkg --add-architecture i386 \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
