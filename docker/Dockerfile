@@ -5,12 +5,11 @@ FROM --platform=linux/amd64 ubuntu:14.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# trusty only survives on old-releases.ubuntu.com, which carries no i386
-# indexes for trusty-security (404) - hence the per-pocket arch lists
+# trusty only survives on old-releases.ubuntu.com, and its trusty-security
+# pocket is broken there (404 on Packages indexes) - frozen archive, so skip it
 RUN { \
-      echo 'deb [arch=amd64,i386] http://old-releases.ubuntu.com/ubuntu/ trusty main restricted universe multiverse'; \
-      echo 'deb [arch=amd64,i386] http://old-releases.ubuntu.com/ubuntu/ trusty-updates main restricted universe multiverse'; \
-      echo 'deb [arch=amd64] http://old-releases.ubuntu.com/ubuntu/ trusty-security main restricted universe multiverse'; \
+      echo 'deb http://old-releases.ubuntu.com/ubuntu/ trusty main restricted universe multiverse'; \
+      echo 'deb http://old-releases.ubuntu.com/ubuntu/ trusty-updates main restricted universe multiverse'; \
     } > /etc/apt/sources.list \
  && dpkg --add-architecture i386 \
  && apt-get update \
