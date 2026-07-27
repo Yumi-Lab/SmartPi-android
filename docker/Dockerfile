@@ -9,10 +9,10 @@ FROM --platform=linux/amd64 debian/eol:wheezy
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Release files are long expired; integrity comes from the frozen archive
+# debian/eol ships a working archive.debian.org sources.list (incl. the
+# security suite the base packages come from) - do not overwrite it, or the
+# i386 multiarch versions can no longer match the installed amd64 ones
 RUN echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive \
- && echo 'deb http://archive.debian.org/debian wheezy main contrib non-free' \
-      > /etc/apt/sources.list \
  && dpkg --add-architecture i386 \
  && apt-get update \
  && apt-get install -y --force-yes --no-install-recommends \
