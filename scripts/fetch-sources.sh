@@ -18,10 +18,11 @@ if [ ! -d lichee ]; then
     || git clone --depth 1 "$LICHEE_FALLBACK" lichee
 fi
 
-if [ ! -d android ]; then
+# The android tree is only needed for full image builds (FETCH_ANDROID=0 skips it)
+if [ "${FETCH_ANDROID:-1}" = "1" ] && [ ! -d android ]; then
   echo "Cloning Android 4.4 tree (large)..."
   git clone --depth 1 "$ANDROID_GIT" android
 fi
 
 echo "Sources ready in $SRC_DIR"
-du -sh lichee android
+du -sh lichee android 2>/dev/null || du -sh lichee

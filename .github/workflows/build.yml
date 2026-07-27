@@ -27,6 +27,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fetch BSP sources
+        env:
+          FETCH_ANDROID: ${{ inputs.target == 'android' && '1' || '0' }}
         run: ./scripts/fetch-sources.sh
 
       - name: Build container
