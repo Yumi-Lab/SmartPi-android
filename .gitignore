@@ -1,0 +1,12 @@
+# BSP sources fetched by scripts/fetch-sources.sh
+sources/
+
+# Mirror downloads and build output
+mirror/
+out/
+*.img
+*.img.zip
+*.tar.zst*
+
+# macOS
+.DS_Store
