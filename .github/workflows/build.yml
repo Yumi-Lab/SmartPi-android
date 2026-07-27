@@ -1,0 +1,57 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Build target
+        type: choice
+        options:
+          - lichee
+          - android
+        default: lichee
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                      /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          sudo docker image prune -af
+          df -h /
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch BSP sources
+        run: ./scripts/fetch-sources.sh
+
+      - name: Build container
+        run: docker build --platform linux/amd64 -t smartpi-android-build docker/
+
+      - name: Build ${{ inputs.target }}
+        run: |
+          docker run --rm --platform linux/amd64 \
+            -v "$GITHUB_WORKSPACE:/work" \
+            smartpi-android-build /work/scripts/build.sh "${{ inputs.target }}"
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p out
+          cp -v sources/lichee/tools/pack/*.img out/ 2>/dev/null || true
+          # lichee-only runs: keep the boot chain pieces for inspection
+          find sources/lichee/out -maxdepth 2 -type f \
+            \( -name 'boot0*' -o -name 'u-boot*' -o -name 'uImage*' -o -name '*.bin' \) \
+            -exec cp -v {} out/ \; 2>/dev/null || true
+          ls -la out/ || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: smartpi-android-${{ inputs.target }}-${{ github.run_number }}
+          path: out/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,81 @@
+name: Mirror sources
+
+# Archives the upstream FriendlyELEC files (Google Drive is quota-flaky and
+# upstream is unmaintained) onto the sources-archive release of this repo.
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_android_tree:
+        description: Also snapshot the GitLab h3_android-4.4 tree (large)
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                      /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install gdown
+        run: pip install gdown
+
+      - name: Download Drive files
+        run: |
+          mkdir -p mirror && cd mirror
+          dl() {
+            for i in 1 2 3; do
+              gdown "$1" -O "$2" && return 0
+              echo "retry $i for $2 (Drive quota?)"; sleep 90
+            done
+            echo "FAILED: $2" >> ../mirror-failures.txt
+            rm -f "$2"
+            return 0
+          }
+          dl 18_7bcI5-IhfDa1M1iVT3-KPa7w7X5Nug sun8iw7p1_android_h3_uart0.img.zip
+          dl 1eGKfQKYhI4fZaTdqShj4Ev9kCpvYrdqZ sha256sum.txt
+          dl 1QdloBW9YaTyqRVAjbpoGCadAhDL_koVH gcc-linaro-arm.tar.xz
+          dl 1Nzug_j2J1xT7O6Gt3ujSWzhJdGy0_ZVF fa-toolchain.tgz
+          dl 18_LzRJoRRINBFTCYs48aBqbTqAIgXVog PhoenixCard_V310.rar
+          dl 1wt88Qcp_Pv0JswFfQp8YP0TcPxJcgh8C LiveSuitV306_For_Linux64.zip
+          sha256sum * > SHA256SUMS.mirror.txt || true
+          ls -la
+
+      - name: Upload Drive files to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view sources-archive >/dev/null 2>&1 || \
+            gh release create sources-archive \
+              --title "Upstream sources archive" \
+              --notes "Mirror of the FriendlyELEC H3 Android 4.4 BSP files (see docs/SOURCES.md). Upstream is unmaintained; this archive is the reference copy."
+          ls mirror/* >/dev/null 2>&1 && gh release upload sources-archive mirror/* --clobber
+          [ -f mirror-failures.txt ] && { echo "Some files failed:"; cat mirror-failures.txt; } || echo "All Drive files mirrored."
+
+      - name: Snapshot GitLab android tree
+        if: ${{ inputs.include_android_tree }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf mirror
+          git clone --depth 1 https://gitlab.com/friendlyelec/h3_android-4.4.git
+          df -h /
+          tar -I 'zstd -T0 -8' -cf h3_android-4.4-snapshot.tar.zst h3_android-4.4
+          rm -rf h3_android-4.4
+          split -b 1900m -d h3_android-4.4-snapshot.tar.zst h3_android-4.4-snapshot.tar.zst.part
+          rm h3_android-4.4-snapshot.tar.zst
+          sha256sum h3_android-4.4-snapshot.tar.zst.part* > h3_android-4.4-snapshot.SHA256SUMS.txt
+          gh release upload sources-archive h3_android-4.4-snapshot.* --clobber
+          echo "Reassemble with: cat h3_android-4.4-snapshot.tar.zst.part* | tar -I zstd -xf -"
