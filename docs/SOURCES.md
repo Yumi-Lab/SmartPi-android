@@ -33,7 +33,7 @@ Drive folder ids for reference: `01_Official images` `1JHCClssLh54d0dtHU88mr4uN4
 | What | Location | Notes |
 |------|----------|-------|
 | Oracle JDK 1.6.0_45 x64 | https://repo.huaweicloud.com/java/jdk/6u45-b06/jdk-6u45-linux-x64.bin | sha256 `6b493aeab16c940cae9e3d07ad2a5c5684fb49cf06c5d44c400c7993db0d12e8` (72087592 bytes, verified 2026-07-27). Pinned in the Dockerfile. |
-| Ubuntu 14.04 apt archive | http://old-releases.ubuntu.com | trusty was removed from the main mirrors |
+| Debian wheezy apt archive | http://archive.debian.org/debian | Permanent. Used instead of Ubuntu 14.04: Canonical purged trusty from old-releases.ubuntu.com (verified 2026-07-27, only precise and older remain). |
 
 ## Reference documentation
 

@@ -15,9 +15,10 @@ Output image: `lichee/tools/pack/sun8iw7p1_android_nanopi-m1_uart0.img`
 
 ## Build environment constraints
 
-- Ubuntu 14.04 x86_64, Oracle JDK 1.6.0_45, make 3.81 (the trusty default). All frozen in [docker/Dockerfile](../docker/Dockerfile).
+- The BSP wants a 2014-era environment: Oracle JDK 1.6.0_45, make 3.81, gcc 4.x host. All frozen in [docker/Dockerfile](../docker/Dockerfile).
+- The historical recommendation was Ubuntu 14.04, but Canonical purged trusty from `old-releases.ubuntu.com` (verified 2026-07-27: the dists listing stops at precise; trusty, xenial and later are gone, wayback never captured the indexes, and public mirrors followed the deletion). The container is therefore based on `debian/eol:wheezy` with `archive.debian.org`, which Debian keeps forever: same era, make 3.81 native, gcc 4.7, i386 multiarch.
 - The Allwinner pack tools are 32-bit i386 ELF binaries: the container installs i386 multiarch libraries. This rules out building on Apple Silicon Macs entirely (Rosetta does not translate i386) and on ARM hosts in general.
-- trusty apt repositories only exist on `old-releases.ubuntu.com`; the Dockerfile rewrites sources.list accordingly.
+- `tedwang/aosp-v4` (the Docker Hub AOSP-KitKat reference image) still exists but is a schema1 manifest, rejected by Docker 26+/containerd 2.1: unusable on modern hosts without a skopeo conversion.
 - The JDK download from the Huawei mirror uses `--no-check-certificate` because trusty's CA store is frozen in time; integrity is enforced by a pinned sha256 instead.
 - Full Android build: about 8 GB RAM, 40 GB disk, 2-4 h on 4 cores. Lichee-only (u-boot + kernel): far smaller, use it for fast iteration.
 

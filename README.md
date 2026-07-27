@@ -21,7 +21,7 @@ Target displays: SmartPad (800x480 HDMI panel with USB touch, mounted upside dow
 ## Approach
 
 - BSP: FriendlyELEC `h3_lichee` (u-boot + linux 3.4.39 + Allwinner pack tools) plus `h3_android-4.4` (Android 4.4.2 tree). Kernel 3.4 uses FEX files compiled to `script.bin`, not device trees.
-- Build environment: Docker image based on Ubuntu 14.04 x86_64 with Oracle JDK 1.6.0_45. The Allwinner pack tools are 32-bit i386 binaries, so builds require an x86_64 Linux host. Apple Silicon Macs cannot build this, even through Rosetta (Rosetta does not translate i386).
+- Build environment: Docker image based on Debian wheezy (`debian/eol:wheezy` + `archive.debian.org`, the durable stand-in for the historically recommended Ubuntu 14.04, which Canonical purged from old-releases) with Oracle JDK 1.6.0_45. The Allwinner pack tools are 32-bit i386 binaries, so builds require an x86_64 Linux host. Apple Silicon Macs cannot build this, even through Rosetta (Rosetta does not translate i386).
 - CI: GitHub Actions on the free runner first (public repo: 4 vCPU, 16 GB RAM, roughly 45-60 GB disk after cleanup, 6 h job limit). See [docs/BUILD.md](docs/BUILD.md).
 
 ## Repository layout

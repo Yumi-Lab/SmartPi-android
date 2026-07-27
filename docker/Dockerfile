@@ -1,19 +1,21 @@
 # Build environment for the FriendlyELEC H3 Android 4.4 BSP.
-# Ubuntu 14.04 is a hard requirement of the 2015-era build system;
-# the Allwinner pack tools are 32-bit i386 binaries (x86_64 hosts only).
-FROM --platform=linux/amd64 ubuntu:14.04
+# The 2015-era build system wants Ubuntu 14.04, but Canonical purged trusty
+# from old-releases.ubuntu.com (verified 2026-07: only precise and older
+# remain). Debian NEVER deletes its archive, so the same-era Debian wheezy
+# (2013: make 3.81 native, gcc 4.7, i386 multiarch) from archive.debian.org
+# is the durable equivalent. The Allwinner pack tools are 32-bit i386
+# binaries (x86_64 hosts only).
+FROM --platform=linux/amd64 debian/eol:wheezy
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# trusty only survives on old-releases.ubuntu.com, and its trusty-security
-# pocket is broken there (404 on Packages indexes) - frozen archive, so skip it
-RUN { \
-      echo 'deb http://old-releases.ubuntu.com/ubuntu/ trusty main restricted universe multiverse'; \
-      echo 'deb http://old-releases.ubuntu.com/ubuntu/ trusty-updates main restricted universe multiverse'; \
-    } > /etc/apt/sources.list \
+# Release files are long expired; integrity comes from the frozen archive
+RUN echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive \
+ && echo 'deb http://archive.debian.org/debian wheezy main contrib non-free' \
+      > /etc/apt/sources.list \
  && dpkg --add-architecture i386 \
  && apt-get update \
- && apt-get install -y --no-install-recommends \
+ && apt-get install -y --force-yes --no-install-recommends \
       build-essential gcc-multilib g++-multilib libc6-dev-i386 \
       libc6:i386 libstdc++6:i386 zlib1g:i386 libncurses5:i386 \
       lib32z1-dev lib32ncurses5-dev \
