@@ -43,11 +43,12 @@ jobs:
       - name: Collect artifacts
         run: |
           mkdir -p out
+          # full android runs produce the flashable image here
           cp -v sources/lichee/tools/pack/*.img out/ 2>/dev/null || true
-          # lichee-only runs: keep the boot chain pieces for inspection
-          find sources/lichee/out -maxdepth 2 -type f \
-            \( -name 'boot0*' -o -name 'u-boot*' -o -name 'uImage*' -o -name '*.bin' \) \
-            -exec cp -v {} out/ \; 2>/dev/null || true
+          # boot chain binaries staged by the lichee build (boot0, u-boot, sboot)
+          cp -v sources/lichee/tools/pack/chips/sun8iw7p1/bin/*.bin out/ 2>/dev/null || true
+          # kernel image
+          cp -v sources/lichee/linux-3.4/output/uImage* out/ 2>/dev/null || true
           ls -la out/ || true
 
       - name: Upload artifacts
