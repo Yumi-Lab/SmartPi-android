@@ -21,12 +21,23 @@ File ids (fetch with `gdown <id>`):
 |------|----------|---------|
 | `sun8iw7p1_android_h3_uart0.img.zip` | `18_7bcI5-IhfDa1M1iVT3-KPa7w7X5Nug` | Official Android 4.4.2 SD image. Step one of the project: flash and boot-test on SmartPi One. In `01_Official images/01_SD card images`. |
 | `sha256sum.txt` | `1eGKfQKYhI4fZaTdqShj4Ev9kCpvYrdqZ` | Checksums for the SD card images folder |
-| `gcc-linaro-arm.tar.xz` | `1QdloBW9YaTyqRVAjbpoGCadAhDL_koVH` | Cross toolchain from `04_SDK and toolchain`. The lichee tree is expected to bundle its own toolchain (brandy); this one is archived in case it is needed. |
+| `gcc-linaro-arm.tar.xz` | `1QdloBW9YaTyqRVAjbpoGCadAhDL_koVH` | Cross toolchain from `04_SDK and toolchain`. The lichee tree does NOT bundle a toolchain: `brandy/build.sh -t` expects this tarball at `lichee/brandy/toolchain/gcc-linaro-arm.tar.xz` and the kernel needs `arm-linux-gnueabi-gcc` on PATH from it. We use the equivalent from `YuzukiHD/sunxi-bsp-toolchains` instead (see below). |
 | `fa-toolchain.tgz` | `1Nzug_j2J1xT7O6Gt3ujSWzhJdGy0_ZVF` | From `04_SDK and toolchain/build-env-on-ubuntu` (with `install.sh` id `1MLuXFSKvm-ottnj3XhZ0BKfuqW2M5MPp`) |
 | `PhoenixCard_V310.rar` | `18_LzRJoRRINBFTCYs48aBqbTqAIgXVog` | Windows SD flashing tool for Allwinner images |
 | `LiveSuitV306_For_Linux64.zip` | `1wt88Qcp_Pv0JswFfQp8YP0TcPxJcgh8C` | Linux USB (FEL) flashing tool |
 
 Drive folder ids for reference: `01_Official images` `1JHCClssLh54d0dtHU88mr4uN4gkmr0vO`, `01_SD card images` `1PV6NnJrgtbiNEX72R9hcKlulFshvwpNV`, `04_SDK and toolchain` `1aOvVXViuT4ajVP3OZT0c39k-yqtLllkk`, `05_Tools` `1XKd6_d4sUnKqBYyarWSPgGz58dydHvd6`, `07_Source codes` `1zJRx4MaSIg1JFhFVhvebkWVW0-nfo7G0`.
+
+## Cross toolchain
+
+The BSP expects `arm-linux-gnueabi-` (soft-float) tools: `linux-3.4/scripts/build.sh` defaults to that prefix and `mkcmd.sh:prepare_toolchain` only adds `brandy/toolchain/gcc-arm/bin` to PATH. `YuzukiHD/sunxi-bsp-toolchains` (GitHub release 1.0.0) preserves the classic sunxi BSP toolchains:
+
+| File | Contents | Use |
+|------|----------|-----|
+| `gcc-linaro.tar.bz2` | gcc-linaro 4.6.3 arm-linux-gnueabi, i686 host binaries (the historical Allwinner toolchain, and the real reason the docs demand i386 multilib) | This is what fetch-sources.sh installs as `brandy/toolchain/gcc-linaro-arm.tar.xz`. sha256 `<see SHA256SUMS on the release>` |
+| `gcc-linaro-arm.tar.xz` | gcc-linaro 4.9-2014.08 arm-linux-gnueabiHF (wrong prefix for this kernel script) | Archived on our release as `gcc-linaro-arm-gnueabihf-4.9.tar.xz` for reference only |
+
+Both are mirrored on the `sources-archive` release of this repository.
 
 ## Build environment
 

@@ -18,6 +18,20 @@ if [ ! -d lichee ]; then
     || git clone --depth 1 "$LICHEE_FALLBACK" lichee
 fi
 
+# Cross toolchain: gcc-linaro 4.6.3 arm-linux-gnueabi (i686 host binaries,
+# hence the i386 multiarch in the container). brandy/build.sh -t expects the
+# tarball at brandy/toolchain/gcc-linaro-arm.tar.xz and extracts it itself
+# (tar auto-detects the bz2 despite the .xz name); the kernel then finds
+# arm-linux-gnueabi-gcc through PATH. Mirrored on our sources-archive release.
+TOOLCHAIN_URL="https://github.com/Yumi-Lab/SmartPi-android/releases/download/sources-archive/gcc-linaro.tar.bz2"
+if [ ! -f lichee/brandy/toolchain/gcc-linaro-arm.tar.xz ]; then
+  echo "Downloading cross toolchain..."
+  curl -fL --retry 3 -o lichee/brandy/toolchain/gcc-linaro-arm.tar.xz "$TOOLCHAIN_URL"
+  # the buildroot flow (linux platform) looks for the same toolchain here
+  mkdir -p lichee/buildroot/dl
+  cp lichee/brandy/toolchain/gcc-linaro-arm.tar.xz lichee/buildroot/dl/gcc-linaro.tar.bz2
+fi
+
 # The android tree is only needed for full image builds (FETCH_ANDROID=0 skips it)
 if [ "${FETCH_ANDROID:-1}" = "1" ] && [ ! -d android ]; then
   echo "Cloning Android 4.4 tree (large)..."
