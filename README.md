@@ -53,11 +53,12 @@ Resource needs for a full Android build: about 8 GB RAM, 40 GB disk, 2-4 h on 4 
 ## Roadmap
 
 - [x] Locate and verify all upstream sources (see [docs/SOURCES.md](docs/SOURCES.md))
-- [ ] Archive sources and official image on Yumi infrastructure (`mirror-sources` workflow, upstream files can disappear)
-- [ ] Boot test of the official `sun8iw7p1_android_h3_uart0.img` on SmartPi One hardware
-- [ ] Reproducible Docker build, first green CI build
+- [x] Archive sources on the `sources-archive` release (the android tree, toolchains and PhoenixCard are in; the official image retries daily until the Drive quota lets it through)
+- [x] Reproducible Docker build, green CI build of lichee (u-boot + kernel, 12 min)
+- [x] Full Android build in CI, producing a flashable image: [v0.1.0-untested](https://github.com/Yumi-Lab/SmartPi-android/releases/tag/v0.1.0-untested) (1 h 23 on a free runner)
+- [ ] **Boot test on SmartPi One hardware** - nothing below can be trusted until this passes
 - [ ] SmartPi One customization: FEX, Yumi branding (bootlogo, bootanimation), SmartPad rotation
-- [ ] Release with flashable image and procedure (PhoenixCard and/or dd)
+- [ ] dd-able image instead of PhoenixCard (see [docs/FLASHING.md](docs/FLASHING.md))
 
 Open questions are tracked in [docs/FLASHING.md](docs/FLASHING.md) (dd-able image production) and [docs/HARDWARE.md](docs/HARDWARE.md) (rotation).
 
